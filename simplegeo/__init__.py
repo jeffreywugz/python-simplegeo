@@ -155,7 +155,7 @@ class Client(object):
             raise Exception("Record has no layer.")
 
         endpoint = self.endpoint('record', layer=record.layer, id=record.id)
-        self._request(endpoint, "PUT", record.to_json())
+        return self._request(endpoint, "PUT", record.to_json())
 
     def add_records(self, layer, records):
         features = {
@@ -163,11 +163,11 @@ class Client(object):
             'features': [record.to_dict() for record in records],
         }
         endpoint = self.endpoint('add_records', layer=layer)
-        self._request(endpoint, "POST", json.dumps(features))
+        return self._request(endpoint, "POST", json.dumps(features))
 
     def delete_record(self, layer, id):
         endpoint = self.endpoint('record', layer=layer, id=id)
-        self._request(endpoint, "DELETE")
+        return self._request(endpoint, "DELETE")
 
     def get_record(self, layer, id):
         endpoint = self.endpoint('record', layer=layer, id=id)

@@ -4,7 +4,6 @@ import oauth2 as oauth
 import simplejson as json
 from httplib2 import Http
 from urlparse import urljoin
-from simplegeo.models import Layer
 
 __version__ = "unknown"
 try:
@@ -67,6 +66,47 @@ class Record(object):
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.id == other.id
 
+class Layer(object):
+    def __init__(self, name, title='', description='', public=False,
+                 callback_urls=[]):
+        self.name = name
+        self.title = title
+        self.description = description
+        self.public = public
+        self.callback_urls = callback_urls
+
+    @classmethod
+    def from_dict(cls, data):
+        if not data:
+            return None
+        layer = cls(data.get('name'), data.get('title'),
+                    data.get('description'), data.get('public'),
+                    data.get('callback_urls', []))
+        return layer
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'title': self.title,
+            'description': self.description,
+            'public': self.public,
+            'callback_urls': self.callback_urls,
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+    def __str__(self):
+        return self.to_json()
+
+    def __repr__(self):
+        return "Layer(name=%s, public=%s)" % (self.name, self.public)
+
+    def __hash__(self):
+        return hash((self.name))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.name == other.name
 
 class APIError(Exception):
     """Base exception for all API errors."""
@@ -116,6 +156,7 @@ class Client(object):
         'density_day': 'density/%(day)s/%(lat)s,%(lon)s.json',
         'density_hour': 'density/%(day)s/%(hour)s/%(lat)s,%(lon)s.json',
         'layer': 'layer/%(layer)s.json',
+        'new_layer': 'layers/%(layer)s.json',
         'contains' : 'contains/%(lat)s,%(lon)s.json',
         'overlaps' : 'overlaps/%(south)s,%(west)s,%(north)s,%(east)s.json',
         'boundary' : 'boundary/%(id)s.json',    
@@ -204,7 +245,7 @@ class Client(object):
         return self._request(endpoint, "GET")
 
     def create_layer(self, layer):
-        endpoint = self.endpoint('layer', layer=layer.name)
+        endpoint = self.endpoint('new_layer', layer=layer.name)
         return self._request(endpoint, "PUT", layer.to_json())
 
     def get_density(self, lat, lon, day, hour=None):

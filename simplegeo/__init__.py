@@ -4,6 +4,7 @@ import oauth2 as oauth
 import simplejson as json
 from httplib2 import Http
 from urlparse import urljoin
+from simplegeo.models import Layer
 
 __version__ = "unknown"
 try:
@@ -201,6 +202,10 @@ class Client(object):
     def get_layer(self, layer):
         endpoint = self.endpoint('layer', layer=layer)
         return self._request(endpoint, "GET")
+
+    def create_layer(self, layer):
+        endpoint = self.endpoint('layer', layer=layer.name)
+        return self._request(endpoint, "PUT", layer.to_json())
 
     def get_density(self, lat, lon, day, hour=None):
         if hour is not None:

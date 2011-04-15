@@ -157,6 +157,7 @@ class Client(object):
         'density_hour': 'density/%(day)s/%(hour)s/%(lat)s,%(lon)s.json',
         'layer': 'layer/%(layer)s.json',
         'new_layer': 'layers/%(layer)s.json',
+        'layers': 'layers.json',
         'contains' : 'contains/%(lat)s,%(lon)s.json',
         'overlaps' : 'overlaps/%(south)s,%(west)s,%(north)s,%(east)s.json',
         'boundary' : 'boundary/%(id)s.json',    
@@ -242,6 +243,10 @@ class Client(object):
 
     def get_layer(self, layer):
         endpoint = self.endpoint('layer', layer=layer)
+        return self._request(endpoint, "GET")
+
+    def get_layers(self):
+        endpoint = self.endpoint('layers')
         return self._request(endpoint, "GET")
 
     def create_layer(self, layer):

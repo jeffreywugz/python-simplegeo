@@ -57,8 +57,10 @@ class Client(simplegeo.Client):
             code = str(response.code)
             message = body
             if isinstance(body, dict):
-                code = body['code']
-                message = body['message']
+                if 'code' in body:
+                    code = body['code']
+                if 'message' in body:
+                    message = body['message']
 
             raise simplegeo.APIError(code, message, response.headers)
 
